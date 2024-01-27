@@ -1,26 +1,25 @@
-use clap::{App, Arg};
+use clap::Parser;
+
+#[derive(Debug, Parser)]
+#[clap(
+    name = env!("CARGO_PKG_NAME"),
+    version = env!("CARGO_PKG_VERSION"),
+    author = env!("CARGO_PKG_AUTHORS"),
+    about = env!("CARGO_PKG_DESCRIPTION"),
+)]
+struct Cli {
+    /// Input text
+    text: Vec<String>,
+
+    /// Do not print newline
+    #[arg(short = 'n')]
+    omit_newline: bool,
+}
 
 fn main() {
-    let matches = App::new("echor")
-        .version("0.1.0")
-        .author("Hoge Fuga <hoge@example.com>")
-        .about("Rust echo")
-        .arg(
-            Arg::with_name("text")
-                .value_name("TEXT")
-                .help("Input text")
-                .required(true)
-                .min_values(1),
-        )
-        .arg(
-            Arg::with_name("omit_newline")
-                .short("n")
-                .help("Do not print newline")
-                .takes_value(false),
-        )
-        .get_matches();
-    let text = matches.values_of_lossy("text").unwrap();
-    let omit_newline = matches.is_present("omit_newline");
+    let cli = Cli::parse();
+    let text = cli.text;
+    let omit_newline = cli.omit_newline;
 
     print!("{}{}", text.join(" "), if omit_newline { "" } else { "\n" });
 }
