@@ -9,6 +9,7 @@ use clap::Parser;
 )]
 struct Cli {
     /// Input text
+    #[arg(required = true)]
     text: Vec<String>,
 
     /// Do not print newline
