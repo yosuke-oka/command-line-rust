@@ -35,25 +35,20 @@ pub fn run(config: Config) -> MyResult<()> {
             Err(e) => eprintln!("Failed to Open {}: {}", file, e),
             Ok(buf) => {
                 let mut line_number = 1;
-                if config.number_lines {
-                    for line in buf.lines() {
-                        println!("{:>6}\t{}", line_number, line?);
+                for line in buf.lines() {
+                    let line = line?;
+                    if config.number_lines {
+                        println!("{:>6}\t{}", line_number, line);
                         line_number += 1;
-                    }
-                } else if config.number_nonblank_lines {
-                    for line in buf.lines() {
-                        match line {
-                            Ok(l) if l == "".to_string() => println!(""),
-                            Ok(l) => {
-                                println!("{:>6}\t{}", line_number, l);
-                                line_number += 1;
-                            }
-                            Err(e) => eprintln!("Failed to read line: {}", e),
+                    } else if config.number_nonblank_lines {
+                        if line.is_empty() {
+                            println!("");
+                        } else {
+                            println!("{:>6}\t{}", line_number, line);
+                            line_number += 1;
                         }
-                    }
-                } else {
-                    for line in buf.lines() {
-                        println!("{}", line?);
+                    } else {
+                        println!("{}", line);
                     }
                 }
             }
