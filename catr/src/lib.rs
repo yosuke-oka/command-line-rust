@@ -33,8 +33,29 @@ pub fn run(config: Config) -> MyResult<()> {
     for file in config.files {
         match open(&file) {
             Err(e) => eprintln!("Failed to Open {}: {}", file, e),
-            Ok(_) => {
-                println!("File: {:?}", file);
+            Ok(buf) => {
+                let mut line_number = 1;
+                if config.number_lines {
+                    for line in buf.lines() {
+                        println!("{:>6}\t{}", line_number, line?);
+                        line_number += 1;
+                    }
+                } else if config.number_nonblank_lines {
+                    for line in buf.lines() {
+                        match line {
+                            Ok(l) if l == "".to_string() => println!(""),
+                            Ok(l) => {
+                                println!("{:>6}\t{}", line_number, l);
+                                line_number += 1;
+                            }
+                            Err(e) => eprintln!("Failed to read line: {}", e),
+                        }
+                    }
+                } else {
+                    for line in buf.lines() {
+                        println!("{}", line?);
+                    }
+                }
             }
         }
     }
